@@ -1,0 +1,13 @@
+CREATE SEQUENCE account_id_seq;
+CREATE TABLE account(
+	
+	account_id BIGINT DEFAULT nextval('account_id_seq') PRIMARY KEY,
+	account_number VARCHAR (20) NOT NULL,
+	account_holder_name VARCHAR (100) NOT NULL,
+	gender VARCHAR (6) NOT NULL,
+	pancard VARCHAR (15) NOT NULL,
+	mobile_number VARCHAR (15) NOT NULL,
+	branch VARCHAR (15),
+	balance NUMERIC (15,2)
+	
+					);
