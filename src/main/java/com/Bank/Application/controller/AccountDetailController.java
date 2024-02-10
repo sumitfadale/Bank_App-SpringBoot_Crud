@@ -43,6 +43,7 @@ public class AccountDetailController {
     	String result =accountDetailService.deleteAccount(id);	
     	  if ("Deleted Sucessfully".equals(result)) {
     		  return new ResponseEntity<>(result, HttpStatus.OK);
+    		  
           } else {
               return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
           }
