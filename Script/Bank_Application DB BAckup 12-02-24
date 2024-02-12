@@ -1,0 +1,236 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.5
+-- Dumped by pg_dump version 14.5
+
+-- Started on 2024-02-12 23:33:00
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+DROP DATABASE "Bank Application";
+--
+-- TOC entry 3319 (class 1262 OID 32797)
+-- Name: Bank Application; Type: DATABASE; Schema: -; Owner: -
+--
+
+CREATE DATABASE "Bank Application" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'English_India.1252';
+
+
+\connect -reuse-previous=on "dbname='Bank Application'"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 5 (class 2615 OID 32807)
+-- Name: postgres; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA "postgres";
+
+
+--
+-- TOC entry 224 (class 1255 OID 32809)
+-- Name: usp_account_config_add(character varying, character varying, character varying, character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: postgres; Owner: -
+--
+
+CREATE FUNCTION "postgres"."usp_account_config_add"("i_account_number" character varying, "i_bank_holder_name" character varying, "i_gender" character varying, "i_pancard_number" character varying, "i_mobile_number" character varying, "i_branch" character varying, "i_balance" numeric, OUT "o_error_code" integer) RETURNS integer
+    LANGUAGE "plpgsql"
+    AS '
+BEGIN
+    BEGIN
+        INSERT INTO account (
+		    account_number,
+			account_holder_name, 
+			gender,
+			pancard, 
+			mobile_number,
+			branch,
+			balance)
+        VALUES (i_account_number, 
+				i_bank_holder_name, 
+				i_gender, 
+				i_pancard_number,
+				i_mobile_number,
+				i_branch, 
+				i_balance);
+        o_error_code := 0; -- Success
+    EXCEPTION
+        WHEN unique_violation THEN
+            o_error_code := 1; -- Account already exists
+        WHEN others THEN
+            o_error_code := 2; -- Failed to create account
+    END;
+END;
+';
+
+
+--
+-- TOC entry 227 (class 1255 OID 32832)
+-- Name: usp_account_config_delete(integer, character varying); Type: FUNCTION; Schema: postgres; Owner: -
+--
+
+CREATE FUNCTION "postgres"."usp_account_config_delete"("i_account_id" integer, "i_account_number" character varying, OUT "o_error_code" integer) RETURNS integer
+    LANGUAGE "plpgsql"
+    AS '
+BEGIN
+    BEGIN
+       Delete from  postgres.account 
+where	   
+			  
+	           account_id =i_account_id;
+               o_error_code := 0; -- Success
+    EXCEPTION
+        WHEN unique_violation THEN
+            o_error_code := 1; -- Account already exists
+        WHEN others THEN
+            o_error_code := 2; -- Failed to create account
+    END;
+END;
+';
+
+
+--
+-- TOC entry 225 (class 1255 OID 32821)
+-- Name: usp_account_config_get_all_account(); Type: FUNCTION; Schema: postgres; Owner: -
+--
+
+CREATE FUNCTION "postgres"."usp_account_config_get_all_account"() RETURNS "refcursor"
+    LANGUAGE "plpgsql"
+    AS '
+DECLARE
+o_account_config_ref refcursor;
+BEGIN
+
+   OPEN o_account_config_ref for 
+   SELECT 
+   account_id as account_id,
+   account_number as account_number,
+   account_holder_name as account_holder_name,
+   gender as gender,
+   pancard as pancard,
+   mobile_number as mobile_number,
+   branch as branch,
+   balance as balance
+   from postgres.account;
+   RETURN o_account_config_ref;
+   END;
+  
+';
+
+
+--
+-- TOC entry 226 (class 1255 OID 32811)
+-- Name: usp_account_config_update(integer, character varying, character varying, character varying, character varying, character varying, character varying, numeric); Type: FUNCTION; Schema: postgres; Owner: -
+--
+
+CREATE FUNCTION "postgres"."usp_account_config_update"("i_account_id" integer, "i_account_number" character varying, "i_bank_holder_name" character varying, "i_gender" character varying, "i_pancard_number" character varying, "i_mobile_number" character varying, "i_branch" character varying, "i_balance" numeric, OUT "o_error_code" integer) RETURNS integer
+    LANGUAGE "plpgsql"
+    AS '
+BEGIN
+    BEGIN
+       UPDATE account SET
+	   
+			   account_number = i_account_number,
+			   account_holder_name=i_bank_holder_name,
+			   gender =i_gender, 
+			   pancard = i_pancard_number,
+			   mobile_number = i_mobile_number,
+			   branch = i_branch,
+			   balance = i_balance
+	  WHERE 
+	           account_id=i_account_id;
+               o_error_code := 0; -- Success
+    EXCEPTION
+        WHEN unique_violation THEN
+            o_error_code := 1; -- Account already exists
+        WHEN others THEN
+            o_error_code := 2; -- Failed to create account
+    END;
+END;
+';
+
+
+SET default_table_access_method = "heap";
+
+--
+-- TOC entry 212 (class 1259 OID 32824)
+-- Name: account; Type: TABLE; Schema: postgres; Owner: -
+--
+
+CREATE TABLE "postgres"."account" (
+    "account_id" bigint DEFAULT "nextval"('"public"."account_id_seq"'::"regclass") NOT NULL,
+    "account_number" character varying(20) NOT NULL,
+    "account_holder_name" character varying(100) NOT NULL,
+    "gender" character varying(6) NOT NULL,
+    "pancard" character varying(15) NOT NULL,
+    "mobile_number" character varying(15) NOT NULL,
+    "branch" character varying(15),
+    "balance" numeric(15,2)
+);
+
+
+--
+-- TOC entry 211 (class 1259 OID 32823)
+-- Name: account_id_seq; Type: SEQUENCE; Schema: postgres; Owner: -
+--
+
+CREATE SEQUENCE "postgres"."account_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- TOC entry 3313 (class 0 OID 32824)
+-- Dependencies: 212
+-- Data for Name: account; Type: TABLE DATA; Schema: postgres; Owner: -
+--
+
+
+
+--
+-- TOC entry 3320 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: account_id_seq; Type: SEQUENCE SET; Schema: postgres; Owner: -
+--
+
+SELECT pg_catalog.setval('"postgres"."account_id_seq"', 1, false);
+
+
+--
+-- TOC entry 3172 (class 2606 OID 32829)
+-- Name: account account_pkey; Type: CONSTRAINT; Schema: postgres; Owner: -
+--
+
+ALTER TABLE ONLY "postgres"."account"
+    ADD CONSTRAINT "account_pkey" PRIMARY KEY ("account_id");
+
+
+-- Completed on 2024-02-12 23:33:00
+
+--
+-- PostgreSQL database dump complete
+--
+

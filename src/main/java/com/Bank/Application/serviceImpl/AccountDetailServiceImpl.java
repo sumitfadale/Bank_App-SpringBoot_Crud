@@ -1,5 +1,7 @@
 package com.Bank.Application.serviceImpl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +26,11 @@ private AccountDetailDao accountDetailDao;
 		// TODO Auto-generated method stub
 		 return accountDetailDao.deleteAccount(id);
 	}
+	@Override
+	public List<AccountDetails> getAllAccountList(AccountDetails account) {
+		// TODO Auto-generated method stub
+		return accountDetailDao.getAllAccountList(account);
+	}
+	
 
 }
